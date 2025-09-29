@@ -279,12 +279,12 @@ export default function Home() {
                 </span>
               </div>
               <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                Built with ❤️ for the AI community. Helping you discover the best AI tools for your needs. 
+                Built for the AI community. Helping you discover the best AI tools for your needs. 
                 Our curated collection features {aiTools.length} tools across {stableCategories.length} categories.
               </p>
               <div className="flex justify-center gap-4">
                 <Button variant="ghost" size="sm" asChild>
-                  <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+                  <a href="" target="_blank" rel="noopener noreferrer">
                     <Github className="w-4 h-4 mr-2" />
                     GitHub
                   </a>
