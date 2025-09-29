@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "/globals.css";
 
 // Base URL for metadata (update if deploying on custom domain)
-const siteUrl = "https://ai-toolkit.directory"; // TODO: replace with production domain
+const siteUrl = ""; // TODO: replace with production domain
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
