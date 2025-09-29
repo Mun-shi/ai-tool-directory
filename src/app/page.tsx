@@ -76,9 +76,9 @@ export default function Home() {
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent" aria-label="AI Tool Directory brand">
                   AI Tool Directory
-                </h1>
+                </span>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
                   Discover the best AI tools
                 </p>
@@ -128,9 +128,9 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-2">
             Quick Access to AI Tools
-          </h2>
+          </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Find and access AI tools instantly - 3 tools per category for quick discovery
           </p>
@@ -326,9 +326,9 @@ export default function Home() {
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent" aria-label="AI Tool Directory brand">
                   AI Tool Directory
-                </h1>
+                </span>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
                   Discover the best AI tools
                 </p>
@@ -382,14 +382,14 @@ export default function Home() {
           transition={{ duration: 0.8 }}
         >
           <div className="space-y-4">
-            <motion.h2 
+            <motion.h1 
               className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               Discover Amazing AI Tools
-            </motion.h2>
+            </motion.h1>
             <motion.p 
               className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
