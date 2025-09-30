@@ -13,7 +13,8 @@ import PricingFilter from "@/components/PricingFilter";
 import QuickView from "@/components/QuickView";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Github, Twitter, Zap, TrendingUp } from "lucide-react";
+import { Sparkles, Github, Twitter, Zap, TrendingUp, Menu, X, Filter as FilterIcon, Search as SearchIcon } from "lucide-react";
+import Image from "next/image";
 import { aiTools, searchTools, getToolsByCategory, getCategoriesWithCounts } from "@/data/aiTools";
 
 export default function Home() {
@@ -22,6 +23,9 @@ export default function Home() {
   const [selectedPricing, setSelectedPricing] = useState<string[]>([]);
   const [currentView, setCurrentView] = useState<'detail' | 'quick'>('quick');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   // Get stable categories with counts - ensures SSR/client consistency
   const stableCategories = useMemo(() => getCategoriesWithCounts(), []);
@@ -61,10 +65,27 @@ export default function Home() {
   if (currentView === 'quick') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-slate-100 to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'ItemList',
+              name: 'Featured AI Tools',
+              itemListElement: filteredTools.slice(0, 10).map((t, i) => ({
+                '@type': 'ListItem',
+                position: i + 1,
+                url: t.link,
+                name: t.name,
+                description: t.description
+              }))
+            })
+          }}
+        />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-gray-100/95 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-4">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
             {/* Logo */}
             <motion.div 
               className="flex items-center gap-3 flex-shrink-0"
@@ -72,32 +93,27 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent" aria-label="AI Tool Directory brand">
-                  AI Tool Directory
-                </span>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Discover the best AI tools
-                </p>
+              <div className="flex items-center gap-3">
+                <Image src="/logos/logo.png" alt="Site logo" width={40} height={40} className="rounded-xl h-10 w-10 object-contain" priority />
+                <div>
+                  <span className="text-xl brand-text" aria-label="AI Toolkit Directory brand">
+                    AI Toolkit Directory
+                  </span>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Discover the best AI tools</p>
+                </div>
               </div>
             </motion.div>
 
-            {/* Center section with search and filters */}
+            {/* Desktop search & filters */}
             <motion.div 
-              className="flex items-center gap-3 flex-1 max-w-2xl"
+              className="hidden lg:flex items-center gap-3 flex-1 max-w-2xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {/* Compact Search Bar */}
               <div className="flex-1 min-w-0">
                 <SearchBar onSearch={setSearchQuery} />
               </div>
-              
-              {/* Filters */}
               <FilterDropdown
                 categories={stableCategories}
                 selectedCategories={selectedCategories}
@@ -109,17 +125,72 @@ export default function Home() {
               />
             </motion.div>
 
-            {/* Right section with view toggle and dark mode */}
+            {/* Right section */}
             <motion.div 
-              className="flex items-center gap-3 flex-shrink-0"
+              className="flex items-center gap-2 flex-shrink-0"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <ViewToggle currentView={currentView} onViewChange={setCurrentView} />
+              <button
+                type="button"
+                onClick={() => setMobileSearchOpen(o => !o)}
+                className="lg:hidden p-2 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 transition"
+                aria-label="Toggle search"
+              >
+                <SearchIcon className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileFiltersOpen(o => !o)}
+                className="lg:hidden p-2 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 transition"
+                aria-label="Toggle filters"
+              >
+                <FilterIcon className="w-5 h-5" />
+              </button>
+              <div className="hidden sm:flex">
+                <ViewToggle currentView={currentView} onViewChange={setCurrentView} />
+              </div>
               <DarkModeToggle />
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(o => !o)}
+                className="lg:hidden p-2 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 transition"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </motion.div>
           </div>
+          {/* Mobile panels */}
+          {(mobileSearchOpen || mobileFiltersOpen || mobileMenuOpen) && (
+            <div className="lg:hidden mt-3 space-y-3" aria-label="Mobile navigation panels">
+              {mobileSearchOpen && (
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+                  <SearchBar onSearch={setSearchQuery} />
+                </div>
+              )}
+              {mobileFiltersOpen && (
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-wrap gap-3">
+                  <FilterDropdown
+                    categories={stableCategories}
+                    selectedCategories={selectedCategories}
+                    onFilterChange={setSelectedCategories}
+                  />
+                  <PricingFilter
+                    selectedPricing={selectedPricing}
+                    onPricingChange={setSelectedPricing}
+                  />
+                </div>
+              )}
+              {mobileMenuOpen && (
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col gap-3">
+                  <ViewToggle currentView={currentView} onViewChange={(v)=>{setCurrentView(v); setMobileMenuOpen(false);}} />
+                  {/* Future extra mobile nav items can go here */}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </header>        {/* Quick Access Header */}
         <motion.section 
@@ -271,12 +342,8 @@ export default function Home() {
           <div className="container mx-auto px-4 py-12">
             <div className="text-center space-y-6">
               <div className="flex items-center justify-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  AI Tool Directory
-                </span>
+                <Image src="/logos/logo.png" alt="Site logo" width={32} height={32} className="rounded-lg h-8 w-8 object-contain" />
+                <span className="text-xl brand-text">AI Toolkit Directory</span>
               </div>
               <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                 Built for the AI community. Helping you discover the best AI tools for your needs. 
@@ -297,7 +364,7 @@ export default function Home() {
                 </Button>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-500 border-t border-gray-200 dark:border-gray-700 pt-6">
-                <p>© 2024 AI Tool Directory. All rights reserved.</p>
+                <p>© 2024 AI Toolkit Directory. All rights reserved.</p>
                 <p className="mt-2">Regularly updated with the latest AI tools and technologies.</p>
               </div>
             </div>
@@ -311,10 +378,45 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-slate-100 to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'ItemList',
+                name: 'AI Tools Directory Listing',
+                itemListElement: filteredTools.slice(0, 15).map((t, i) => ({
+                  '@type': 'ListItem',
+                  position: i + 1,
+                  url: t.link,
+                  name: t.name,
+                  description: t.description
+                }))
+              },
+              ...filteredTools.slice(0, 5).map(t => ({
+                '@type': 'SoftwareApplication',
+                name: t.name,
+                applicationCategory: 'AI Tool',
+                offers: {
+                  '@type': 'Offer',
+                  price: t.pricingType === 'free' ? 0 : undefined,
+                  priceCurrency: t.pricingType === 'free' ? 'USD' : undefined,
+                  availability: 'https://schema.org/OnlineOnly'
+                },
+                operatingSystem: 'Any',
+                description: t.description,
+                url: t.link
+              }))
+            ]
+          })
+        }}
+      />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-gray-100/95 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-4">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
             {/* Logo */}
             <motion.div 
               className="flex items-center gap-3 flex-shrink-0"
@@ -322,32 +424,27 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent" aria-label="AI Tool Directory brand">
-                  AI Tool Directory
-                </span>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Discover the best AI tools
-                </p>
+              <div className="flex items-center gap-3">
+                <Image src="/logos/logo.png" alt="Site logo" width={40} height={40} className="rounded-xl h-10 w-10 object-contain" priority />
+                <div>
+                  <span className="text-xl brand-text" aria-label="AI Toolkit Directory brand">
+                    AI Toolkit Directory
+                  </span>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Discover the best AI tools</p>
+                </div>
               </div>
             </motion.div>
 
-            {/* Center section with search and filters */}
+            {/* Desktop search & filters */}
             <motion.div 
-              className="flex items-center gap-3 flex-1 max-w-2xl"
+              className="hidden lg:flex items-center gap-3 flex-1 max-w-2xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {/* Compact Search Bar */}
               <div className="flex-1 min-w-0">
                 <SearchBar onSearch={setSearchQuery} />
               </div>
-              
-              {/* Filters */}
               <FilterDropdown
                 categories={stableCategories}
                 selectedCategories={selectedCategories}
@@ -359,17 +456,71 @@ export default function Home() {
               />
             </motion.div>
 
-            {/* Right section with view toggle and dark mode */}
+            {/* Right section */}
             <motion.div 
-              className="flex items-center gap-3 flex-shrink-0"
+              className="flex items-center gap-2 flex-shrink-0"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <ViewToggle currentView={currentView} onViewChange={setCurrentView} />
+              <button
+                type="button"
+                onClick={() => setMobileSearchOpen(o => !o)}
+                className="lg:hidden p-2 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 transition"
+                aria-label="Toggle search"
+              >
+                <SearchIcon className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileFiltersOpen(o => !o)}
+                className="lg:hidden p-2 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 transition"
+                aria-label="Toggle filters"
+              >
+                <FilterIcon className="w-5 h-5" />
+              </button>
+              <div className="hidden sm:flex">
+                <ViewToggle currentView={currentView} onViewChange={setCurrentView} />
+              </div>
               <DarkModeToggle />
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(o => !o)}
+                className="lg:hidden p-2 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 transition"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </motion.div>
           </div>
+          {/* Mobile panels */}
+          {(mobileSearchOpen || mobileFiltersOpen || mobileMenuOpen) && (
+            <div className="lg:hidden mt-3 space-y-3" aria-label="Mobile navigation panels">
+              {mobileSearchOpen && (
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+                  <SearchBar onSearch={setSearchQuery} />
+                </div>
+              )}
+              {mobileFiltersOpen && (
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-wrap gap-3">
+                  <FilterDropdown
+                    categories={stableCategories}
+                    selectedCategories={selectedCategories}
+                    onFilterChange={setSelectedCategories}
+                  />
+                  <PricingFilter
+                    selectedPricing={selectedPricing}
+                    onPricingChange={setSelectedPricing}
+                  />
+                </div>
+              )}
+              {mobileMenuOpen && (
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col gap-3">
+                  <ViewToggle currentView={currentView} onViewChange={(v)=>{setCurrentView(v); setMobileMenuOpen(false);}} />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
@@ -592,12 +743,8 @@ export default function Home() {
         <div className="container mx-auto px-4 py-12">
           <div className="text-center space-y-6">
             <div className="flex items-center justify-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                AI Tool Directory
-              </span>
+              <Image src="/logos/logo.png" alt="Site logo" width={32} height={32} className="rounded-lg h-8 w-8 object-contain" />
+              <span className="text-xl brand-text">AI Toolkit Directory</span>
             </div>
             <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Built for the AI community. Helping you discover the best AI tools for your needs. 
@@ -618,7 +765,7 @@ export default function Home() {
               </Button>
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-500 border-t border-gray-200 dark:border-gray-700 pt-6">
-              <p>© 2024 AI Tool Directory. All rights reserved.</p>
+              <p>© 2024 AI Toolkit Directory. All rights reserved.</p>
               <p className="mt-2">Regularly updated with the latest AI tools and technologies.</p>
             </div>
           </div>
